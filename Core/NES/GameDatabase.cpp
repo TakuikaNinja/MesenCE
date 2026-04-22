@@ -23,6 +23,18 @@ T GameDatabase::ToInt(string value)
 	return std::stoi(value);
 }
 
+template<typename T>
+T GameDatabase::ToSize(string value)
+{
+	if(value.empty()) {
+		return 0;
+	} else if(value[0] == 'b') {
+		return std::stoi(value.substr(1));
+	} else {
+		return std::stoi(value) * 1024;
+	}
+}
+
 void GameDatabase::LoadGameDb(vector<string> data)
 {
 	for(string &row : data) {
@@ -35,11 +47,11 @@ void GameDatabase::LoadGameDb(vector<string> data)
 			gameInfo.Pcb = values[3];
 			gameInfo.Chip = values[4];
 			gameInfo.MapperID = (uint16_t)ToInt<uint32_t>(values[5]);
-			gameInfo.PrgRomSize = ToInt<uint32_t>(values[6]) * 1024;
-			gameInfo.ChrRomSize = ToInt<uint32_t>(values[7]) * 1024;
-			gameInfo.ChrRamSize = ToInt<uint32_t>(values[8]) * 1024;
-			gameInfo.WorkRamSize = ToInt<uint32_t>(values[9]) * 1024;
-			gameInfo.SaveRamSize = ToInt<uint32_t>(values[10]) * 1024;
+			gameInfo.PrgRomSize = ToSize<uint32_t>(values[6]);
+			gameInfo.ChrRomSize = ToSize<uint32_t>(values[7]);
+			gameInfo.ChrRamSize = ToSize<uint32_t>(values[8]);
+			gameInfo.WorkRamSize = ToSize<uint32_t>(values[9]);
+			gameInfo.SaveRamSize = ToSize<uint32_t>(values[10]);
 			gameInfo.HasBattery = ToInt<uint32_t>(values[11]) == 0 ? false : true;
 			gameInfo.Mirroring = values[12];
 			gameInfo.InputType = (GameInputType)ToInt<uint32_t>(values[13]);
@@ -264,16 +276,16 @@ void GameDatabase::SetGameInfo(uint32_t romCrc, RomData &romData, bool updateRom
 			}
 			MessageManager::Log(msg);
 		}
-		MessageManager::Log("[DB] PRG ROM: " + std::to_string(info.PrgRomSize / 1024) + " KB");
-		MessageManager::Log("[DB] CHR ROM: " + std::to_string(info.ChrRomSize / 1024) + " KB");
+		MessageManager::Log("[DB] PRG ROM: " + StringUtilities::SizeToString(info.PrgRomSize));
+		MessageManager::Log("[DB] CHR ROM: " + StringUtilities::SizeToString(info.ChrRomSize));
 		if(info.ChrRamSize > 0) {
-			MessageManager::Log("[DB] CHR RAM: " + std::to_string(info.ChrRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] CHR RAM: " + StringUtilities::SizeToString(info.ChrRamSize));
 		}
 		if(info.WorkRamSize > 0) {
-			MessageManager::Log("[DB] Work RAM: " + std::to_string(info.WorkRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] Work RAM: " + StringUtilities::SizeToString(info.WorkRamSize));
 		}
 		if(info.SaveRamSize > 0) {
-			MessageManager::Log("[DB] Save RAM: " + std::to_string(info.SaveRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] Save RAM: " + StringUtilities::SizeToString(info.SaveRamSize));
 		}
 		MessageManager::Log("[DB] Battery: " + string(info.HasBattery ? "Yes" : "No"));
 
